@@ -23,6 +23,31 @@ import (
 
 func TestHash(t *testing.T) {
 	t.Parallel()
+	t.Run("new", func(t *testing.T) {
+		t.Parallel()
+		h := ed2k.New()
+		sum := h.Sum(nil)
+		want := "31d6cfe0d16ae931b73c59d7e0c089c0"
+		got := fmt.Sprintf("%x", sum)
+		if got != want {
+			t.Errorf("Got %s, want %s", got, want)
+		}
+	})
+	t.Run("empty", func(t *testing.T) {
+		t.Parallel()
+		data := make([]byte, 0)
+		h := ed2k.New()
+		_, err := h.Write(data)
+		if err != nil {
+			t.Fatal(err)
+		}
+		sum := h.Sum(nil)
+		want := "31d6cfe0d16ae931b73c59d7e0c089c0"
+		got := fmt.Sprintf("%x", sum)
+		if got != want {
+			t.Errorf("Got %s, want %s", got, want)
+		}
+	})
 	t.Run("smallzero", func(t *testing.T) {
 		t.Parallel()
 		data := make([]byte, 9728000)

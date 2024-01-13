@@ -42,15 +42,14 @@ type Hash struct {
 
 // New returns a new Hash computing the eD2k checksum.
 func New() *Hash {
-	return &Hash{}
+	return &Hash{
+		subhash: md4.New(),
+	}
 }
 
 // Write adds more data to the running hash.
 // It never returns an error.
 func (h *Hash) Write(p []byte) (int, error) {
-	if h.subhash == nil {
-		h.subhash = md4.New()
-	}
 	total := len(p)
 	for len(p) > 0 {
 		p2 := h.limitNextChunk(p)
@@ -92,9 +91,6 @@ func (h *Hash) Sum(b []byte) []byte {
 func (h *Hash) Reset() {
 	h.written = 0
 	h.hashlist = h.hashlist[:0]
-	if h.subhash != nil {
-		h.subhash.Reset()
-	}
 }
 
 // Size returns the number of bytes Sum will return.
