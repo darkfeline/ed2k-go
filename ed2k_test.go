@@ -33,7 +33,7 @@ func TestHash(t *testing.T) {
 			t.Errorf("Got %s, want %s", got, want)
 		}
 	})
-	t.Run("empty", func(t *testing.T) {
+	t.Run("empty write", func(t *testing.T) {
 		t.Parallel()
 		data := make([]byte, 0)
 		h := ed2k.New()
@@ -48,7 +48,7 @@ func TestHash(t *testing.T) {
 			t.Errorf("Got %s, want %s", got, want)
 		}
 	})
-	t.Run("smallzero", func(t *testing.T) {
+	t.Run("one block", func(t *testing.T) {
 		t.Parallel()
 		data := make([]byte, 9728000)
 		h := ed2k.New()
@@ -63,7 +63,7 @@ func TestHash(t *testing.T) {
 			t.Errorf("Got %s, want %s", got, want)
 		}
 	})
-	t.Run("bigzero", func(t *testing.T) {
+	t.Run("two blocks", func(t *testing.T) {
 		t.Parallel()
 		data := make([]byte, 19456000)
 		h := ed2k.New()
@@ -78,7 +78,7 @@ func TestHash(t *testing.T) {
 			t.Errorf("Got %s, want %s", got, want)
 		}
 	})
-	t.Run("smallzero_partial", func(t *testing.T) {
+	t.Run("one block multi writes", func(t *testing.T) {
 		t.Parallel()
 		data := make([]byte, 9728000)
 		h := ed2k.New()
@@ -97,7 +97,7 @@ func TestHash(t *testing.T) {
 			t.Errorf("Got %s, want %s", got, want)
 		}
 	})
-	t.Run("bigzero_blockwise", func(t *testing.T) {
+	t.Run("two block blockwise writes", func(t *testing.T) {
 		t.Parallel()
 		data := make([]byte, 19456000)
 		h := ed2k.New()
@@ -116,7 +116,7 @@ func TestHash(t *testing.T) {
 			t.Errorf("Got %s, want %s", got, want)
 		}
 	})
-	t.Run("bigzero_partial", func(t *testing.T) {
+	t.Run("two block multi writes", func(t *testing.T) {
 		t.Parallel()
 		data := make([]byte, 19456000)
 		h := ed2k.New()
@@ -130,6 +130,21 @@ func TestHash(t *testing.T) {
 		}
 		sum := h.Sum(nil)
 		want := "194ee9e4fa79b2ee9f8829284c466051"
+		got := fmt.Sprintf("%x", sum)
+		if got != want {
+			t.Errorf("Got %s, want %s", got, want)
+		}
+	})
+	t.Run("one and partial blocks", func(t *testing.T) {
+		t.Parallel()
+		data := make([]byte, 9728001)
+		h := ed2k.New()
+		_, err := h.Write(data[:9728001])
+		if err != nil {
+			t.Fatal(err)
+		}
+		sum := h.Sum(nil)
+		want := "06329e9dba1373512c06386fe29e3c65"
 		got := fmt.Sprintf("%x", sum)
 		if got != want {
 			t.Errorf("Got %s, want %s", got, want)

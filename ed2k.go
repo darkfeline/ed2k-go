@@ -84,6 +84,9 @@ func (h *Hash) Sum(b []byte) []byte {
 	}
 	h2 := md4.New()
 	h2.Write(h.hashlist)
+	if h.written%ChunkSize != 0 {
+		h2.Write(h.subhash.Sum(nil))
+	}
 	return h2.Sum(b)
 }
 
