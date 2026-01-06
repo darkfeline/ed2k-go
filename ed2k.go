@@ -108,3 +108,34 @@ func (h *Hash) Size() int {
 func (h *Hash) BlockSize() int {
 	return BlockSize
 }
+
+// An AltHash is the alternate/wrong implementation of eD2k, where an
+// additional zero block is appended whenever the input is an exact
+// multiple of the block size.
+//
+// This is discouraged, but some old implementations use it.
+type AltHash struct {
+	Hash
+}
+
+// NewAlt returns a new [AltHash], which see for more info and
+// disclaimers.
+func NewAlt() *AltHash {
+	return &AltHash{
+		Hash: Hash{
+			subhash: md4.New(),
+		},
+	}
+}
+
+// Sum appends the current hash to b and returns the resulting slice.
+// It does not change the underlying hash state.
+func (h *AltHash) Sum(b []byte) []byte {
+	if h.written < ChunkSize {
+		return h.subhash.Sum(b)
+	}
+	h2 := md4.New()
+	h2.Write(h.hashlist)
+	h2.Write(h.subhash.Sum(nil))
+	return h2.Sum(b)
+}

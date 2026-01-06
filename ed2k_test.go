@@ -96,3 +96,76 @@ func TestHash(t *testing.T) {
 
 	}
 }
+
+func TestAltHash(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name string
+		data [][]byte
+		want string
+	}{
+		{
+			name: "new",
+			data: nil,
+			want: "31d6cfe0d16ae931b73c59d7e0c089c0",
+		},
+		{
+			name: "empty write",
+			data: [][]byte{testBytes[:0]},
+			want: "31d6cfe0d16ae931b73c59d7e0c089c0",
+		},
+		{
+			name: "one block",
+			data: [][]byte{testBytes[:9728000]},
+			want: "fc21d9af828f92a8df64beac3357425d",
+		},
+		{
+			name: "one block multi writes",
+			data: [][]byte{testBytes[:1000000], testBytes[:9728000-1000000]},
+			want: "fc21d9af828f92a8df64beac3357425d",
+		},
+		{
+			name: "one and partial blocks",
+			data: [][]byte{testBytes[:9728000+1]},
+			want: "06329e9dba1373512c06386fe29e3c65",
+		},
+		{
+			name: "two block",
+			data: [][]byte{testBytes[:2*9728000]},
+			want: "114b21c63a74b6ca922291a11177dd5c",
+		},
+		{
+			name: "two block blockwise writes",
+			data: [][]byte{testBytes[:9728000], testBytes[:9728000]},
+			want: "114b21c63a74b6ca922291a11177dd5c",
+		},
+		{
+			name: "two block multi writes",
+			data: [][]byte{testBytes[:10728000], testBytes[:2*9728000-10728000]},
+			want: "114b21c63a74b6ca922291a11177dd5c",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Parallel()
+			h := ed2k.NewAlt()
+			for _, d := range c.data {
+				_, err := h.Write(d)
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+			sum := h.Sum(nil)
+			got := fmt.Sprintf("%x", sum)
+			if got != c.want {
+				t.Errorf("Got %s, want %s", got, c.want)
+			}
+			sum = h.Sum(nil)
+			got = fmt.Sprintf("%x", sum)
+			if got != c.want {
+				t.Errorf("Second sum differs, got %s, want %s", got, c.want)
+			}
+		})
+
+	}
+}
