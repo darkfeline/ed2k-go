@@ -87,6 +87,11 @@ func TestHash(t *testing.T) {
 			if got != c.want {
 				t.Errorf("Got %s, want %s", got, c.want)
 			}
+			sum = h.Sum(nil)
+			got = fmt.Sprintf("%x", sum)
+			if got != c.want {
+				t.Errorf("Second sum differs, got %s, want %s", got, c.want)
+			}
 		})
 
 	}
