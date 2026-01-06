@@ -40,7 +40,7 @@ type Hash struct {
 	subhash  hash.Hash
 }
 
-// New returns a new Hash computing the eD2k checksum.
+// New returns a new [Hash] computing the eD2k checksum.
 func New() *Hash {
 	return &Hash{
 		subhash: md4.New(),
@@ -90,19 +90,19 @@ func (h *Hash) Sum(b []byte) []byte {
 	return h2.Sum(b)
 }
 
-// Reset resets the Hash to its initial state.
+// Reset resets the [Hash] to its initial state.
 func (h *Hash) Reset() {
 	h.written = 0
 	h.hashlist = h.hashlist[:0]
 }
 
-// Size returns the number of bytes Sum will return.
+// Size returns the number of bytes [Hash.Sum] will return.
 func (h *Hash) Size() int {
 	return Size
 }
 
-// BlockSize returns the hash's underlying block size.
-// The Write method must be able to accept any amount
+// BlockSize returns the underlying block size of the [Hash].
+// [Hash.Write] must be able to accept any amount
 // of data, but it may operate more efficiently if all writes
 // are a multiple of the block size.
 func (h *Hash) BlockSize() int {
